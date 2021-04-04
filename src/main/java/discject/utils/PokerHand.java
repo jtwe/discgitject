@@ -65,7 +65,7 @@ public class PokerHand {
 		deck = new ArrayList<Integer>();
 		for (int i=0; i<54; i++) deck.add(i);
 		Collections.shuffle(deck);
-		
+
 		setHandRanking(verbose);
 	}
 	
@@ -110,8 +110,8 @@ public class PokerHand {
 		boolean isStraight = false, isFlush = false;
 		int straightFlush = -1;
 		
-		if ( (suitCounts.get(0) + jokers) >= 5) isFlush = true;
-		if (verbose) System.out.println("Max suit = " + (suitCounts.get(0) + jokers) + ", flush = " + isFlush);
+		if ( suitCounts.size()>0 && (suitCounts.get(0) + jokers) >= 5) isFlush = true;
+		if (verbose) System.out.println("Max suit = " + ( ( suitCounts.size()>0?suitCounts.get(0):0) + jokers) + ", flush = " + isFlush);
 		
 		for (int i=-1; i<9; i++) {
 			int seen = 0;
@@ -151,7 +151,7 @@ public class PokerHand {
 		if (ranks[12]>0 || jokers>0) this.handRanking = 1;
 		
 //		"pair", // 2
-		if (rankCounts.get(0)+jokers>=2) this.handRanking = 2;
+		if ( (rankCounts.size()>0?rankCounts.get(0):0) + jokers>=2) this.handRanking = 2;
 		
 //		"jacks or better", // 3  
 		for (int i=9; i<=12; i++) if (ranks[i]+jokers>=2) this.handRanking = 3;
@@ -160,7 +160,7 @@ public class PokerHand {
 		if (rankCounts.size()>1 && rankCounts.get(1)>=2) this.handRanking = 4;
 		
 //		"three of a kind", // 5 
-		if (rankCounts.get(0)+jokers>=3) this.handRanking = 5;
+		if ( (rankCounts.size()>0?rankCounts.get(0):0) +jokers>=3) this.handRanking = 5;
 		
 //		"straight", // 6
 		if (isStraight) this.handRanking = 6;
@@ -169,13 +169,13 @@ public class PokerHand {
 		if (isFlush) this.handRanking = 7;
 		
 //		"full house", // 8
-		if (rankCounts.get(0)+jokers>=3 && rankCounts.size()>1 && rankCounts.get(1)>=2) this.handRanking = 8;
+		if ( (rankCounts.size()>0?rankCounts.get(0):0) +jokers>=3 && rankCounts.size()>1 && rankCounts.get(1)>=2) this.handRanking = 8;
 		
 //		"four of a kind", // 9 
-		if (rankCounts.get(0)+jokers>=4) this.handRanking = 9;
+		if ( (rankCounts.size()>0?rankCounts.get(0):0) +jokers>=4) this.handRanking = 9;
 		
 //		"five of a kind", // 10
-		if (rankCounts.get(0)+jokers>=5) this.handRanking = 10;
+		if ( (rankCounts.size()>0?rankCounts.get(0):0) +jokers>=5) this.handRanking = 10;
 
 //		"straight flush", // 11
 		if (straightFlush>=0) this.handRanking = 11;
