@@ -30,19 +30,19 @@ public class PokerHand {
 	};
 	private static int[] handRankPp = {0, 2, 3, 4, 5, 6, 8, 10, 10, 15, 15, 15, 15};
 	private static String[] handRankPpStr = {
-			"0", // "nothing", // 0
-			"2", // "ace high", // 1
-			"3", // "pair", // 2
-			"4", // "jacks or better", // 3  
-			"5", // "two pair", // 4
-			"6", // "three of a kind", // 5 
-			"8", // "straight", // 6
-			"10", // "flush", // 7
-			"10 and double", // "full house", // 8
-			"15 and double", // "four of a kind", // 9 
-			"15 and double and add modifiers", // "five of a kind", // 10
-			"15 and double and add modifiers and conviction", // "straight flush", // 11
-			"15 and double and add modifiers and conviction and holy crap", // "royal flush" // 12
+			"0 PP", // "nothing", // 0
+			"2 PP", // "ace high", // 1
+			"3 PP", // "pair", // 2
+			"4 PP", // "jacks or better", // 3  
+			"5 PP", // "two pair", // 4
+			"6 PP", // "three of a kind", // 5 
+			"8 PP", // "straight", // 6
+			"10 PP", // "flush", // 7
+			"10 PP and double effect", // "full house", // 8
+			"15 PP and double effect", // "four of a kind", // 9 
+			"15 PP and double effect and add modifiers", // "five of a kind", // 10
+			"15 PP and double effect and add modifiers and conviction", // "straight flush", // 11
+			"15 PP and double effect and add modifiers and conviction and holy crap", // "royal flush" // 12
 	};
 	
 	private static String getCardName(int card) {
@@ -205,7 +205,9 @@ public class PokerHand {
 	}
 
 	public String getHandRankPpStr() {
-		return handRankPpStr[this.handRanking];
+		boolean jokers = false;
+		for (int i=0; i<numCards; i++) if (deck.get(i)>=52) jokers = true;
+		return (jokers?"refund bennie and ":"") + handRankPpStr[this.handRanking];
 	}
 
 	public String getHandCustomEmojis(Long serverId) {
@@ -213,21 +215,29 @@ public class PokerHand {
 		
 		for (int i=0; i<this.numCards; i++) {
 			int card = this.deck.get(i);
+			String emoji1 = null;
+			String emoji2 = null;
 			if (card<52) {
 				int rank = card/4;
 				int suit = card%4;
 				String color = "red";
 				if (suit==0 || suit==3) color = "black";
-				toRet.append(EmojiUtils.getCustomEmojiTagForServer(serverId, color + "_" + rankStr[rank].toLowerCase()));
-				toRet.append(EmojiUtils.getCustomEmojiTagForServer(serverId, "suit_" + suitFullStr[suit]));
+				emoji1 = EmojiUtils.getCustomEmojiTagForServer(serverId, color + "_" + rankStr[rank].toLowerCase());
+				emoji2 = EmojiUtils.getCustomEmojiTagForServer(serverId, "suit_" + suitFullStr[suit]);
 			} else {
 				if (card==52) {
-					toRet.append(EmojiUtils.getCustomEmojiTagForServer(serverId, "joker_red_left"));
-					toRet.append(EmojiUtils.getCustomEmojiTagForServer(serverId, "joker_red_right"));
+					emoji1 = EmojiUtils.getCustomEmojiTagForServer(serverId, "joker_red_left");
+					emoji2 = EmojiUtils.getCustomEmojiTagForServer(serverId, "joker_red_right");
 				} else {
-					toRet.append(EmojiUtils.getCustomEmojiTagForServer(serverId, "joker_black_left"));
-					toRet.append(EmojiUtils.getCustomEmojiTagForServer(serverId, "joker_black_right"));
+					emoji1 = EmojiUtils.getCustomEmojiTagForServer(serverId, "joker_black_left");
+					emoji2 = EmojiUtils.getCustomEmojiTagForServer(serverId, "joker_black_right");
 				}
+			}
+			if (emoji1==null || emoji2==null) {
+				toRet.append(getCardName(card) + " "); 
+			} else {
+				toRet.append(emoji1);
+				toRet.append(emoji2);
 			}
 		}
 		
