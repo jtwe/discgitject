@@ -69,30 +69,32 @@ public class PokerAction {
 
 		if (now) {
 			PokerHand ph = new PokerHand(cards);
-			CompletableFuture<Message> fm = event.getChannel().sendMessage(ph.getHandCustomEmojis(serverId));
-			CompletableFuture<Message> fm2 = event.getChannel().sendMessage(ph.getHandDescription() + " (" + ph.getHandRankPpStr() + ")");
+			if (serverId!=null) event.getChannel().sendMessage(ph.getHandCustomEmojis(serverId));
+			event.getChannel().sendMessage(ph.getHandDescription() + " (" + ph.getHandRankPpStr() + ")");
 		} else {
 			Matcher mAll = pAll.matcher(message);
 
-			CompletableFuture<Message> fm = event.getChannel().sendMessage("Shuffling...");
+			PokerHand ph = new PokerHand(cards);
 
-			Message m = fm.join();
+			if (serverId!=null) {
+				CompletableFuture<Message> fm = event.getChannel().sendMessage("Shuffling...");
+				Message m = fm.join();
 
-			PokerHand ph = new PokerHand(cards-3);
+				for (int i=(mAll.find()?1:(cards-3)); i<=cards; i++) {
+					synchronized(m) {
+						try {
+							m.wait(1500);
 
-			for (int i=(mAll.find()?1:(cards-3)); i<=cards; i++) {
-				synchronized(m) {
-					try {
-						m.wait(1500);
+							ph.setNumCards(i);
+							m.edit(ph.getHandCustomEmojis(serverId));
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
 
-						ph.setNumCards(i);
-						m.edit(ph.getHandCustomEmojis(serverId));
-					} catch (InterruptedException e) {
-						e.printStackTrace();
 					}
-
 				}
 			}
+
 			event.getChannel().sendMessage(ph.getHandDescription() + " (" + ph.getHandRankPpStr() + ")");
 		}
 	}
