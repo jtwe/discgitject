@@ -50,54 +50,51 @@ public class PokerAction {
 	private static final Pattern pNumber = Pattern.compile("\\d+");
 	private static final Pattern pNow = Pattern.compile("now");
 	private static final Pattern pAll = Pattern.compile("all");
-	
+
 	public static void newDeal(MessageCreateEvent event) {
 		String message = event.getMessageContent().toLowerCase();
-		if (event.getServer().isPresent()) {
-			int cards = 5;
-			Matcher mNumber = pNumber.matcher(message);
-			if (mNumber.find()) {
-				cards = Integer.parseInt(mNumber.group());
-			}
-			if (cards<4) cards = 4;
-			if (cards>11) cards = 11;
-			
-			boolean now = false;
-			if (pNow.matcher(message).find()) now = true;
+		Long serverId = null;
+		if (event.getServer().isPresent()) serverId = event.getServer().get().getId();
 
-			if (now) {
-				Long serverId = event.getServer().get().getId();
-				PokerHand ph = new PokerHand(cards);
-				CompletableFuture<Message> fm = event.getChannel().sendMessage(ph.getHandCustomEmojis(serverId));
-				CompletableFuture<Message> fm2 = event.getChannel().sendMessage(ph.getHandDescription() + " (" + ph.getHandRankPpStr() + ")");
-			} else {
-				Matcher mAll = pAll.matcher(message);
-				
-				Long serverId = event.getServer().get().getId();
-				CompletableFuture<Message> fm = event.getChannel().sendMessage("Shuffling...");
+		int cards = 5;
+		Matcher mNumber = pNumber.matcher(message);
+		if (mNumber.find()) {
+			cards = Integer.parseInt(mNumber.group());
+		}
+		if (cards<4) cards = 4;
+		if (cards>11) cards = 11;
 
-				Message m = fm.join();
-				
-				PokerHand ph = new PokerHand(cards-3);
+		boolean now = false;
+		if (pNow.matcher(message).find()) now = true;
 
-				for (int i=(mAll.find()?1:(cards-3)); i<=cards; i++) {
-					synchronized(m) {
-						try {
-							m.wait(1500);
-							
-							ph.setNumCards(i);
-							m.edit(ph.getHandCustomEmojis(serverId));
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-						
-					}
-				}
-				event.getChannel().sendMessage(ph.getHandDescription() + " (" + ph.getHandRankPpStr() + ")");
-			}
+		if (now) {
+			PokerHand ph = new PokerHand(cards);
+			CompletableFuture<Message> fm = event.getChannel().sendMessage(ph.getHandCustomEmojis(serverId));
+			CompletableFuture<Message> fm2 = event.getChannel().sendMessage(ph.getHandDescription() + " (" + ph.getHandRankPpStr() + ")");
 		} else {
-			retroDeal(event);
+			Matcher mAll = pAll.matcher(message);
+
+			CompletableFuture<Message> fm = event.getChannel().sendMessage("Shuffling...");
+
+			Message m = fm.join();
+
+			PokerHand ph = new PokerHand(cards-3);
+
+			for (int i=(mAll.find()?1:(cards-3)); i<=cards; i++) {
+				synchronized(m) {
+					try {
+						m.wait(1500);
+
+						ph.setNumCards(i);
+						m.edit(ph.getHandCustomEmojis(serverId));
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+
+				}
+			}
+			event.getChannel().sendMessage(ph.getHandDescription() + " (" + ph.getHandRankPpStr() + ")");
 		}
 	}
-	
+
 }
