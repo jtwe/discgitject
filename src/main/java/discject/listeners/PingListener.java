@@ -27,6 +27,8 @@ public class PingListener implements MessageCreateListener {
 			PokerAction.retroDeal(event);
 		} else if (message.startsWith("&deal")) {
 			PokerAction.newDeal(event);
+		} else if (message.startsWith("&card")) {
+			PokerAction.cards(event);
 		} else if (message.startsWith("&ping")) {
 			System.out.println("Ping!");
 			event.getChannel().sendMessage("Ponk.");
@@ -56,7 +58,10 @@ public class PingListener implements MessageCreateListener {
 				event.getChannel().sendMessage("With emojis: " + EmojiParser.parseToAliases(event.getMessageContent().substring(1)));
 			}
 		} else if (event.getMessage().isPrivateMessage()) {
-			event.getChannel().sendMessage("Options: \n &deal - deal poker hand (# = number of cards, min 4, max 11; all = deal all one at a time; now = deal all immediately) \n &ping - alive message \n &echo - echo message");
+			event.getChannel().sendMessage("Options: \n" + 
+					" &deal - deal poker hand (# = number of cards, default 5, min 5, max 11; all = deal all one at a time; now = deal all immediately) \n" +
+					" &card - deal cards (# = number of cards, default 1) \n" +
+					" &ping - alive message \n &echo - echo message");
 		} else {
 			System.out.println("Ignoring: " + event.getMessageContent() );
 		}

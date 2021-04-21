@@ -61,7 +61,7 @@ public class PokerAction {
 		if (mNumber.find()) {
 			cards = Integer.parseInt(mNumber.group());
 		}
-		if (cards<4) cards = 4;
+		if (cards<5) cards = 5;
 		if (cards>11) cards = 11;
 
 		boolean now = false;
@@ -97,6 +97,25 @@ public class PokerAction {
 
 			event.getChannel().sendMessage(ph.getHandDescription() + " (" + ph.getHandRankPpStr() + ")");
 		}
+	}
+
+	public static void cards(MessageCreateEvent event) {
+		String message = event.getMessageContent().toLowerCase();
+		Long serverId = null;
+		if (event.getServer().isPresent()) serverId = event.getServer().get().getId();
+
+		int cards = 1;
+		Matcher mNumber = pNumber.matcher(message);
+		if (mNumber.find()) {
+			cards = Integer.parseInt(mNumber.group());
+		}
+		if (cards<1) cards = 1;
+		if (cards>11) cards = 11;
+		
+		PokerHand ph = new PokerHand(cards);
+		if (serverId!=null) event.getChannel().sendMessage(ph.getHandCustomEmojis(serverId));
+		if (serverId==null) event.getChannel().sendMessage(ph.getHandCards());
+		
 	}
 
 }

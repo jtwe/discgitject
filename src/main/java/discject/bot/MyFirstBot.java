@@ -2,6 +2,7 @@ package discject.bot;
 
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
+import org.javacord.api.entity.activity.ActivityType;
 import org.javacord.api.event.server.ServerJoinEvent;
 import org.javacord.api.listener.server.ServerJoinListener;
 
@@ -29,6 +30,8 @@ public class MyFirstBot {
 					EmojiUtils.loadEmojis(event.getApi());
 				}
 			});
+    		
+    		api.updateActivity(ActivityType.LISTENING, "your requests");
     		
     		// Print the invite url of your bot
     		System.out.println("You can invite the bot by using the following url: " + api.createBotInvite());

@@ -188,6 +188,16 @@ public class PokerHand {
 		return this.handRanking;
 	}
 
+	public String getHandCards() {
+		StringBuffer toRet = new StringBuffer();
+		
+		for (int i=0; i<this.numCards; i++) {
+			toRet.append(getCardName(this.deck.get(i)) + " ");
+		}
+
+		return toRet.toString();
+	}
+	
 	public String getHandDescription() {
 		StringBuffer toRet = new StringBuffer();
 		
